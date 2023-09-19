@@ -1,0 +1,142 @@
+---
+title: STAT 230 Homework 2
+author: "My Name"
+output: pdf_document
+---
+
+**1.** (Manatees)
+
+Load the following dataset:
+
+```{r, echo=TRUE}
+manatees <- read.csv("https://www.math.carleton.edu/ckelling/data/manatees.csv", header = TRUE)
+
+```
+
+The data records the number of manatees killed by powerboats and the number of powerboats registered in Florida (in thousands) from 1982 to 2000. ;-(
+
+(a) Make a plot of the number manatee deaths vs. number of powerboats and add the least squares line to the plot. Comment on the apparent relationship (shape, strength, and direction of association).
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+
+(b) The year 1991 is missing from this dataset. An estimate of the number of powerboats in that year, by averaging the values from 1990 and 1992, is 599,400 boats. Assuming that to be the number of boats in 1991, give a 90% prediction interval for the number of manatees killed in that year and interpret the interval.
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+(c) Since we don't actually know the number of boats registered in 1991, do you think that accounting for this additional source of uncertainty will increase or decrease the width of the prediction interval you calculated in part (b)?
+
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+(d) Do the assumptions of linearity, constant variance, and normality appear to be appropriate for these data? Justify your opinion. (Note: I am not asking you to check the independence assumption.)
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+
+**2.** *Note*: the following problem involves log transformations, the topic of Friday's class. You should, however, be able to complete the question before Friday's class since the question only asks you to consider interpreting the regression diagnostic plots and $R^2$ value (from Wednesday) rather than interpreting the model itself. You can think about it as preparation for Friday's class if you choose to do it before class.
+
+This is Adaptation of Exercise 8.26 (the data is `ex0826` in the `Sleuth3` R package). First read the problem statement for Exercise 8.26 to understand what the data is.
+
+(a) Make a plot of average metabolic rate vs. mass for the 95 animals in this dataset. Make sure the axes are appropriately labeled. Comment on the relationship (shape, strength, direction of association).
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+(b) Fit the simple linear model of metabolic rate against mass. (You do not need to report or interpret the parameter estimates.) Give the $R^2$ value for this model and interpret this number. On the basis of the $R^2$ value, is this model "good"?
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+(c) Plot the residuals from the model in part (b) vs. the mass. To see what is going on more easily, also plot the residuals vs. the log(mass). Are the standard regression assumptions satisfied? \textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+Note: to show two plots side-by-side, you can use the `patchwork` library to combine plots made using `ggplot`. You can use this code to produce the plots:
+
+```{r, eval = FALSE}
+#note that this code doesn't run because of "eval = FALSE" above
+
+# fit model from part (b)
+SLR_model <- lm(Metab ~ Mass, data = ex0826)
+SLR_aug <- augment(SLR_model)
+
+# make plots for part (c)
+library(patchwork)
+residVsMass <- ggplot(SLR_aug, aes(x = Mass, y = .resid)) + geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(x = "Mass (kg)", y = "residuals") 
+
+residVsLogMass <- ggplot(SLR_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  labs(x = "log(Mass)", y = "residuals")
+
+residVsMass + residVsLogMass
+```
+
+(d) Make a plot of the log(metablic rate) vs. the log(mass). Compare with the plot in (a).
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+(e) Fit the simple linear model of log(metablic rate) against log(mass). Give the $R^2$ value for this model. Which $R^2$ value is bigger: the original model, or the log-log model?
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+(f) Plot the residuals from the model in part (e) vs. the log(mass). Are the standard regression assumptions satisfied? Remember that the `augment` function needs to be given the original data if there are transformations in your model. You can use the following code to make the residual plot:
+\textbf{Answer:}
+
+```{r}
+#code with comments here
+
+```
+
+```{r, eval = FALSE}
+#note that this code doesn't run because of "eval = FALSE" above
+
+loglog_model <- lm(log(Metab) ~ log(Mass), data=ex0826)
+loglog_aug <- augment(loglog_model, newdata = ex0826)
+
+ggplot(loglog_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  labs(x = "log(Mass)", y = "residuals")
+```
+
+(g) Which model is better: the original model or the log-log model?
+\textbf{Answer:}
+
+
+## Recommended exercises (do not turn in, some answers in book):
+Chapter 8 exercises 1, 5, 10, 17, and 20
