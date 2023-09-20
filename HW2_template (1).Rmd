@@ -33,7 +33,7 @@ ggplot(data = manatees) + aes(x = boats, y = killed) + geom_point() + geom_smoot
 
 
 (b) The year 1991 is missing from this dataset. An estimate of the number of powerboats in that year, by averaging the values from 1990 and 1992, is 599,400 boats. Assuming that to be the number of boats in 1991, give a 90% prediction interval for the number of manatees killed in that year and interpret the interval.
-\textbf{Answer:}
+\textbf{Answer:} We are 90% confident that in 1991 the number of manatees killed was between 22.666 and 42.073 (rounded to the nearest thousandth)
 
 ```{r}
 #code with comments here
@@ -42,7 +42,7 @@ ggplot(data = manatees) + aes(x = boats, y = killed) + geom_point() + geom_smoot
 manatee_lm = lm(killed ~ boats, data = manatees)
 
 #forms a prediction for # of killed manatees when there were 599.4 (thousand) boats
-prediction <- predict(manatee_lm, newdata = list(boats = 599.4), interval = "prediction", se = TRUE)
+prediction <- predict(manatee_lm, newdata = list(boats = 599.4), interval = "prediction", se = TRUE, level = .90)
 
 #prints prediction and interval
 prediction
@@ -50,7 +50,7 @@ prediction
 
 (c) Since we don't actually know the number of boats registered in 1991, do you think that accounting for this additional source of uncertainty will increase or decrease the width of the prediction interval you calculated in part (b)?
 
-\textbf{Answer:} It will increase the prediction interval. As one adds uncertainty the width of the prediction interval will increase since it must now cover a larger span to maintain the 90% accuracy of the prediction.
+\textbf{Answer:} It will increase the width of the prediction interval. As one adds uncertainty the width of the prediction interval will increase since it must now cover a larger span to maintain the 90% accuracy of the prediction.
 
 ```{r}
 #code with comments here
