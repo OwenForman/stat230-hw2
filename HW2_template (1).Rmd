@@ -27,13 +27,14 @@ library(ggplot2)
 
 
 #creates plot of killed vs boats, adds points, and least squares line
-ggplot(data = manatees) + aes(x = boats, y = killed) + geom_point() + geom_smooth(method = "lm", se = FALSE)
+ggplot(data = manatees) + aes(x = boats, y = killed) + geom_point() + geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Manatee Deaths vs. # of Boats in Florida", x = "Num of Boats (in thousands)", y = "Num of Manatees killed")
 
 ```
 
 
 (b) The year 1991 is missing from this dataset. An estimate of the number of powerboats in that year, by averaging the values from 1990 and 1992, is 599,400 boats. Assuming that to be the number of boats in 1991, give a 90% prediction interval for the number of manatees killed in that year and interpret the interval.
-\textbf{Answer:} We are 90% confident that in 1991 the number of manatees killed was between 22.666 and 42.073 (rounded to the nearest thousandth)
+\textbf{Answer:} We are 90% confident that in 1991 the number of manatees killed in Florida by powerboats was between 22.666 and 42.073 (rounded to the nearest thousandth)
 
 ```{r}
 #code with comments here
@@ -50,18 +51,38 @@ prediction
 
 (c) Since we don't actually know the number of boats registered in 1991, do you think that accounting for this additional source of uncertainty will increase or decrease the width of the prediction interval you calculated in part (b)?
 
-\textbf{Answer:} It will increase the width of the prediction interval. As one adds uncertainty the width of the prediction interval will increase since it must now cover a larger span to maintain the 90% accuracy of the prediction.
+\textbf{Answer:} I think it will increase the width of the prediction interval. As one adds uncertainty the width of the prediction interval will increase since it must now cover a larger span to maintain the 90% accuracy of the prediction.
 
-```{r}
-#code with comments here
-
-```
 
 (d) Do the assumptions of linearity, constant variance, and normality appear to be appropriate for these data? Justify your opinion. (Note: I am not asking you to check the independence assumption.)
-\textbf{Answer:}
+
+\textbf{Answer:} We can check our assumptions of linearity and constant variance by observing the residual plot shown below. Although we cannot be 100% sure, there does not appear to be a discernable pattern within the plot and instead has random scattering above and below the y = 0 line. This agrees with our assumption of linearity and constant variance.
+
+Next, to check the assumption of normality, we can observe the Q-Q plot also shown below. From observation we can see that our sample quantiles do not follow the expected normal quantiles perfectly, however this is likely due to our small sample size. We haven't gone over how to simulate from a random of size n distribution so that analysis is not included here. Since, using the information we have available to us, the answer is unclear, we cannot make an accurate assessment of whether or not our assumption of normality holds.
+
+Finally, we must consider the assumption of independence. It is extremely hard to say, especially because we don't have knowledge about how the data was collected. The only possible reason they wouldn't be independent that I can think of is that the number of manatees killed in the first year will slightly affect the manatee population in the second year, which could have an affect on the number of manatees killed in year 2. This would cause the data points collected to be slightly (although probably marginal to the point of it not mattering) affect the following point, which would make them not truly independant.
+
+To illustrate the point consider the example: imagine there were 100 manatees in year 1 and 10 of them get killed by boats. There'd then be 90 manatees that make it to year 2 + however many manatees are born, for the sake of the example say they perfectly couple up and all have kids, so there would then be 135 manatees in year 2. However if no manatees were killed though we'd have 100 that survive and 50 newborn manatees for a total of 150 manatees. The number of boats in year 2 is the same across both examples, but the number of manatees are different. While there is no (given) proof that there is a correlation between more manatees and more manatees killed, it logically follows that it is at the very least a possibility. Thus we cannot claim with certainty that the assumption of independence holds when there's a chance it doesn't.
 
 ```{r}
 #code with comments here
+#loads necessary library
+library(broom)
+
+#augment dataset to include resid values
+manatee_aug <- augment(manatee_lm)
+
+#resid plot
+ggplot(manatee_aug, aes(x = boats, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "Manatee Residual Plot", y= "Residuals", x = "Number of Boats (in thousands)")
+
+#Q-Q plot
+ggplot(manatee_aug, aes(sample = .resid)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(title = "Manatee Q-Q Plot", y = "Sample Quantiles", x = "Normal Quantiles")
 
 ```
 
@@ -71,25 +92,60 @@ prediction
 This is Adaptation of Exercise 8.26 (the data is `ex0826` in the `Sleuth3` R package). First read the problem statement for Exercise 8.26 to understand what the data is.
 
 (a) Make a plot of average metabolic rate vs. mass for the 95 animals in this dataset. Make sure the axes are appropriately labeled. Comment on the relationship (shape, strength, direction of association).
-\textbf{Answer:}
+\textbf{Answer:} It is hard to comment on the graph because there are lots of data points clumped around 0, and a few extreme outliers. That being said, from what I can visually tell there does appear to be a strong positive correlation between Mass and Avg Metabolic Rate. The relationship shape is extremely hard to tell because of given reasons, but if I had to make an assessment based on the visual it appears to be at least a little curved (aka not linear).
 
 ```{r}
 #code with comments here
 
+#loads library for problem
+library(Sleuth3)
+
+#simple scatterplot of Avg Metabolic Rate vs Avg Mass of Mammals
+ggplot(data = ex0826, aes(x = Mass, y = Metab)) + 
+  geom_point() +
+  labs(title = "Avg Metabolic Rate vs. Avg Mass of Mammals", x = "Avg Specie Mass", y = "Avg Metabolic Rate")
 ```
 
 (b) Fit the simple linear model of metabolic rate against mass. (You do not need to report or interpret the parameter estimates.) Give the $R^2$ value for this model and interpret this number. On the basis of the $R^2$ value, is this model "good"?
-\textbf{Answer:}
+
+\textbf{Answer:} The R^2 value is .9788. The interpretation of this that approx 97.88% of the variation in a mammals observed avg metabolic rate can be explained by its mass. On the basis of the given $R^2$ value, this model is exceptionally "good" HOWEVER, because of what was mentioned in part a) that there are massive outliers and the graph doesn't appear to be linear, so we cannot interpret or use this R^2 statistic.
 
 ```{r}
 #code with comments here
+
+#prints plot with linear regression line
+ggplot(data = ex0826, aes(x = Mass, y = Metab)) + 
+  geom_point() +
+  labs(title = "Regression of Avg Metabolic Rate vs. Mass", x = "Mass", y = "Avg Metabolic Rate") +
+  geom_smooth(method = "lm", se = FALSE)
+
+#fits linear model onto data
+ex0826_lm <- lm(Metab ~ Mass, data = ex0826)
+
+#prints R^2 statistic
+summary(ex0826_lm)$r.squared
 
 ```
 
-(c) Plot the residuals from the model in part (b) vs. the mass. To see what is going on more easily, also plot the residuals vs. the log(mass). Are the standard regression assumptions satisfied? \textbf{Answer:}
+(c) Plot the residuals from the model in part (b) vs. the mass. To see what is going on more easily, also plot the residuals vs. the log(mass). Are the standard regression assumptions satisfied? \textbf{Answer:} No, the standard regression assumptions, namely linearity and constant variance are NOT satisfied. In the unaugmented (non log-ged) residual plot the points are clumped up right next to eachother with no apparent random variance and one or two major outliers in the far corners of the plot, and the augmented (log-ed) residual plot the points follow a clear pattern (looks like they're following some kind of exponential curve).
 
 ```{r}
 #code with comments here
+
+#augments linear model
+ex0826_aug <- augment(ex0826_lm)
+
+#plots resid plot
+ggplot(ex0826_aug, aes(x = Mass, y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "Avg Specie Mass Resid Plot", y= "Residuals", x = "Avg Specie Mass")
+
+#plots augmented resid plot (log(Mass))
+ggplot(ex0826_aug, aes(x = log(Mass), y = .resid)) +
+  geom_point() + 
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "log(Avg Specie Mass) Resid Plot ", y= "Residuals", x = "log(Avg Specie Mass)")
 
 ```
 
@@ -116,27 +172,41 @@ residVsMass + residVsLogMass
 ```
 
 (d) Make a plot of the log(metablic rate) vs. the log(mass). Compare with the plot in (a).
-\textbf{Answer:}
+\textbf{Answer:} Compared to the plot of in (a) this plot not only looks more linear, but is significantly easier to read and comprehend because the axis's are several orders of magnitude smaller which reins in the outlier cases to be much closer (visually) to the rest of the data.
 
 ```{r}
 #code with comments here
+
+ggplot(data = ex0826, aes(x = log(Mass), y = log(Metab))) + 
+  geom_point() +
+  labs(title = "log(Avg Metabolic Rate) vs. log(Mass) of Mammals", x = "log(Mass)", y = "log(Avg Metabolic Rate)") 
+
 
 ```
 
 (e) Fit the simple linear model of log(metablic rate) against log(mass). Give the $R^2$ value for this model. Which $R^2$ value is bigger: the original model, or the log-log model?
-\textbf{Answer:}
+\textbf{Answer:} The R value of this model is .9649 which is slightly less thanthe original model. However it is still quite a large R^2 value.
 
 ```{r}
 #code with comments here
 
+ex0826log_lm <- lm(data = ex0826, log(Metab) ~ log(Mass))
+
+ex0826log_aug <- augment(ex0826log_lm, newdata = ex0826)
+
+summary(ex0826log_lm)$r.squared
 ```
 
+  
 (f) Plot the residuals from the model in part (e) vs. the log(mass). Are the standard regression assumptions satisfied? Remember that the `augment` function needs to be given the original data if there are transformations in your model. You can use the following code to make the residual plot:
 \textbf{Answer:}
 
 ```{r}
 #code with comments here
 
+ggplot(ex0826log_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed") + 
+  labs(x = "log(Mass)", y = "residuals")
 ```
 
 ```{r, eval = FALSE}
