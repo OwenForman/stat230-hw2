@@ -56,13 +56,13 @@ prediction
 
 (d) Do the assumptions of linearity, constant variance, and normality appear to be appropriate for these data? Justify your opinion. (Note: I am not asking you to check the independence assumption.)
 
-\textbf{Answer:} We can check our assumptions of linearity and constant variance by observing the residual plot shown below. Although we cannot be 100% sure, there does not appear to be a discernable pattern within the plot and instead has random scattering above and below the y = 0 line. This agrees with our assumption of linearity and constant variance.
+\textbf{Answer:} We can check our assumptions of linearity and constant variance by observing the residual plot shown below. Although we cannot be 100% sure, there does not appear to be a discernible pattern within the plot, which instead appears to have random scattering above and below the y = 0 line. This agrees with our assumption of linearity and constant variance.
 
-Next, to check the assumption of normality, we can observe the Q-Q plot also shown below. From observation we can see that our sample quantiles do not follow the expected normal quantiles perfectly, however this is likely due to our small sample size. We haven't gone over how to simulate from a random of size n distribution so that analysis is not included here. Since, using the information we have available to us, the answer is unclear, we cannot make an accurate assessment of whether or not our assumption of normality holds.
+Next, to check the assumption of normality, we can observe the Q-Q plot also shown below. From observation we can see that our sample quantiles do not follow the expected normal quantiles perfectly, however this is likely due to our small sample size. We haven't gone over how to simulate from a random of size n distribution so that analysis is not included here. Since, using the information we have available to us, the answer is unclear, we cannot make an accurate assessment of whether or not our assumption of normality holds. 
 
-Finally, we must consider the assumption of independence. It is extremely hard to say, especially because we don't have knowledge about how the data was collected. The only possible reason they wouldn't be independent that I can think of is that the number of manatees killed in the first year will slightly affect the manatee population in the second year, which could have an affect on the number of manatees killed in year 2. This would cause the data points collected to be slightly (although probably marginal to the point of it not mattering) affect the following point, which would make them not truly independant.
+Finally, we must consider the assumption of independence. It is extremely hard to say, especially because we don't have knowledge about how the data was collected. The only possible reason they wouldn't be independent that I can think of is that the number of manatees killed in the first year will slightly affect the manatee population in the second year, which could have an affect on the number of manatees killed in year 2. This would cause the data points collected to be slightly (although probably marginal to the point of it not mattering) affected by previous points, which would make them not truly independant.
 
-To illustrate the point consider the example: imagine there were 100 manatees in year 1 and 10 of them get killed by boats. There'd then be 90 manatees that make it to year 2 + however many manatees are born, for the sake of the example say they perfectly couple up and all have kids, so there would then be 135 manatees in year 2. However if no manatees were killed though we'd have 100 that survive and 50 newborn manatees for a total of 150 manatees. The number of boats in year 2 is the same across both examples, but the number of manatees are different. While there is no (given) proof that there is a correlation between more manatees and more manatees killed, it logically follows that it is at the very least a possibility. Thus we cannot claim with certainty that the assumption of independence holds when there's a chance it doesn't.
+To illustrate the point consider the example: imagine there were 100 manatees in year 1 (the first year of recordered data) and 10 of them get killed by boats. There'd then be 90 manatees that make it to year 2 plus however many manatees are born, for the sake of the example say they perfectly couple up and all have kids, so there would then be 135 manatees in year 2. However if no manatees were killed though we'd have 100 that survive and 50 newborn manatees for a total of 150 manatees. The number of boats in year 2 is the same across both examples, but the number of manatees are different. So, it is possible that the number of manatees killed in year 1 slightly affects the number of manatees killed in year 2. While there is no (given) proof that there is a correlation between more manatees and more manatees killed, it logically follows that it is, at the very, least a possibility. Thus we cannot claim with certainty that the assumption of independence holds when there's a chance it doesn't.
 
 ```{r}
 #code with comments here
@@ -136,16 +136,18 @@ summary(ex0826_lm)$r.squared
 ex0826_aug <- augment(ex0826_lm)
 
 #plots resid plot
-ggplot(ex0826_aug, aes(x = Mass, y = .resid)) +
+residvmass <- ggplot(ex0826_aug, aes(x = Mass, y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(title = "Avg Specie Mass Resid Plot", y= "Residuals", x = "Avg Specie Mass")
 
 #plots augmented resid plot (log(Mass))
-ggplot(ex0826_aug, aes(x = log(Mass), y = .resid)) +
+residvmass_log <- ggplot(ex0826_aug, aes(x = log(Mass), y = .resid)) +
   geom_point() + 
   geom_hline(yintercept = 0, linetype = "dashed") +
   labs(title = "log(Avg Specie Mass) Resid Plot ", y= "Residuals", x = "log(Avg Specie Mass)")
+
+residvmass + residvmass_log
 
 ```
 
@@ -190,20 +192,29 @@ ggplot(data = ex0826, aes(x = log(Mass), y = log(Metab))) +
 ```{r}
 #code with comments here
 
+#fits transformed model
 ex0826log_lm <- lm(data = ex0826, log(Metab) ~ log(Mass))
 
+#augments fitted model
 ex0826log_aug <- augment(ex0826log_lm, newdata = ex0826)
 
+#prints R^2 value
 summary(ex0826log_lm)$r.squared
+
+#prints model with fitted regression line
+ggplot(data = ex0826, aes(x = log(Mass), y = log(Metab))) + 
+  geom_point() +
+  labs(title = "log(Avg Metabolic Rate) vs. log(Mass) of Mammals", x = "log(Mass)", y = "log(Avg Metabolic Rate)") + geom_smooth(method = "lm", se = FALSE)
 ```
 
   
 (f) Plot the residuals from the model in part (e) vs. the log(mass). Are the standard regression assumptions satisfied? Remember that the `augment` function needs to be given the original data if there are transformations in your model. You can use the following code to make the residual plot:
-\textbf{Answer:}
+\textbf{Answer:} The standard regression assumptions do appear to be satisfied given this model. There is no visual pattern to the residuals, and an equal amount of points appears to fall above and below the y=0 line 
 
 ```{r}
 #code with comments here
 
+#prints resid model
 ggplot(ex0826log_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed") + 
   labs(x = "log(Mass)", y = "residuals")
@@ -221,8 +232,7 @@ ggplot(loglog_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
 ```
 
 (g) Which model is better: the original model or the log-log model?
-\textbf{Answer:}
-
+\textbf{Answer:} I believe that the log-log model is better, as the regression assumptions are met so we are confidentaly able to fit a regression line onto the data. However, it is important to note that one con of the log-log model is that interpretation's of the model are significantly less easy to come up with than the original. We haven't covered interpretation of log-log models in class at this point (I think we will Friday), but it will definitely be harder to derive than with an un-transformed model. However since the original model wasn't linear, no fitting of a regression line and interpretation of it could happen in the first place, so even if it's a little more confusing to interpret it's still "better" than no model at all.
 
 ## Recommended exercises (do not turn in, some answers in book):
 Chapter 8 exercises 1, 5, 10, 17, and 20
