@@ -232,6 +232,7 @@ ggplot(loglog_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
 ```
 
 (g) Which model is better: the original model or the log-log model?
+
 \textbf{Answer:} I believe that the log-log model is better, as the regression assumptions are met so we are confidentaly able to fit a regression line onto the data. However, it is important to note that one con of the log-log model is that interpretation's of the model are significantly less easy to come up with than the original. We haven't covered interpretation of log-log models in class at this point (I think we will Friday), but it will definitely be harder to derive than with an un-transformed model. However since the original model wasn't linear, no fitting of a regression line and interpretation of it could happen in the first place, so even if it's a little more confusing to interpret it's still "better" than no model at all.
 
 ## Recommended exercises (do not turn in, some answers in book):
