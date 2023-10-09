@@ -132,6 +132,9 @@ summary(ex0826_lm)$r.squared
 ```{r}
 #code with comments here
 
+#loads patchwork library
+library(patchwork)
+
 #augments linear model
 ex0826_aug <- augment(ex0826_lm)
 
@@ -230,6 +233,8 @@ ggplot(loglog_aug, aes(x = log(Mass), y = .resid)) + geom_point() +
   geom_hline(yintercept = 0, linetype = "dashed") + 
   labs(x = "log(Mass)", y = "residuals")
 ```
+
+
 
 (g) Which model is better: the original model or the log-log model?
 
